@@ -60,6 +60,28 @@ public class Turret : Construction
         {
             StopAttack();
         }
+
+        if (isAttacking && attackTarget != null && attackTarget.IsAlive)
+        {
+            LookAtTarget();
+        }
+    }
+
+    void LookAtTarget()
+    {
+        if (attackTarget == null || attackTarget.Transform == null) return;
+        Vector3 targetPosition = attackTarget.Transform.position;
+        Vector3 lookPos = targetPosition - transform.position;
+        lookPos.y = 0;
+        if (lookPos != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(lookPos);
+            transform.rotation = Quaternion.Slerp(
+                transform.rotation,
+                targetRotation,
+                Time.deltaTime * 5f
+            );
+        }
     }
 
 }
