@@ -4,11 +4,13 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class Turret : Construction
 {
-    [SerializeField] float attackDamage;
-    [SerializeField] float attackCooldown;
     [SerializeField] GameObject bullet;
-    [SerializeField] float bulletSpeed;
     [SerializeField] Transform shootPoint;
+
+    float attackDamage;
+    float attackCooldown;
+    float bulletSpeed;
+
     IDamageable attackTarget;
     Coroutine attackCoroutine;
     bool isAttacking = false;
@@ -35,6 +37,19 @@ public class Turret : Construction
         }
     }
 
+    protected override void ApplyLevel(ConstructionLevelData data)
+    {
+        base.ApplyLevel(data);
+
+        TurretLevelData turretData = data as TurretLevelData;
+        if (turretData != null)
+        {
+            attackDamage = turretData.attackDamage;
+            attackCooldown = turretData.attackCooldown;
+            bulletSpeed = turretData.bulletSpeed;
+        }
+    }
+
     IEnumerator AttackRoutine()
     {
         while (attackTarget != null && attackTarget.IsAlive && isAttacking)
@@ -42,6 +57,7 @@ public class Turret : Construction
             GameObject newBullet =  Instantiate(bullet, shootPoint.position, Quaternion.identity);
             newBullet.transform.LookAt(attackTarget.Transform);
             newBullet.GetComponent<Bullet>().SetSpeed(bulletSpeed);
+            newBullet.GetComponent<Bullet>().SetDamage(attackDamage);
             //attackTarget.TakeDamage(attackDamage);
             yield return new WaitForSeconds(attackCooldown);
         }
