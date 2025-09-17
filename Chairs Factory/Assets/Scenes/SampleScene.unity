@@ -226,7 +226,6 @@ GameObject:
   m_Component:
   - component: {fileID: 784271255}
   - component: {fileID: 784271254}
-  - component: {fileID: 784271256}
   m_Layer: 0
   m_Name: NavMesh Surface
   m_TagString: Untagged
@@ -281,19 +280,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &784271256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 784271253}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 32faef972f48d0f4b8a5caa44558082c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  surface: {fileID: 784271254}
 --- !u!1 &1246917889
 GameObject:
   m_ObjectHideFlags: 0
@@ -525,9 +511,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1291911397261842844, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 1997304795581574706, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
+      propertyPath: m_Layer
+      value: 6
+      objectReference: {fileID: 0}
     - target: {fileID: 6268054953741586630, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
       propertyPath: m_Name
       value: Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 6268054953741586630, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
+      propertyPath: m_Layer
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 6463984197792002549, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
       propertyPath: m_LocalPosition.x
@@ -575,7 +573,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7464513615809555531, guid: 66da4e548469252418c7e13739e0e8f9, type: 3}
       propertyPath: maxHealth
-      value: 20
+      value: 100
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -593,6 +591,10 @@ PrefabInstance:
     - target: {fileID: 1778636809994020414, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
       propertyPath: m_Name
       value: Turret
+      objectReference: {fileID: 0}
+    - target: {fileID: 1778636809994020414, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 3529052895385888058, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
       propertyPath: m_LocalPosition.x
@@ -633,6 +635,18 @@ PrefabInstance:
     - target: {fileID: 3529052895385888058, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3617611293658601520, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 5744796169063964905, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
+      propertyPath: m_Layer
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8550027289751776382, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
+      propertyPath: m_Layer
+      value: 3
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

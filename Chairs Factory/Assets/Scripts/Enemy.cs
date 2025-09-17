@@ -8,6 +8,8 @@ public class Enemy : Damageable
     [SerializeField] float attackRange;
     [SerializeField] float attackDamage;
     [SerializeField] float attackCooldown;
+    
+    
 
     NavMeshAgent agent;
     IDamageable attackTarget;
@@ -37,9 +39,9 @@ public class Enemy : Damageable
             }
             else
             {
-                agent.isStopped = false;
-                agent.SetDestination(attackTarget.Transform.position);
-                StopAttackCoroutine();
+                //agent.isStopped = false;
+                //agent.SetDestination(attackTarget.Transform.position);
+                //StopAttackCoroutine();
             }
         }
         else
