@@ -6,7 +6,7 @@ public abstract class ConstructionUpgradeConfig : ScriptableObject
     public abstract ConstructionLevelData GetLevel(int index);
 }
 
-[CreateAssetMenu(menuName = "Game/Wall Upgrade Config")]
+[CreateAssetMenu(menuName = "Construction/Wall Upgrade Config")]
 public class WallUpgradeConfig : ConstructionUpgradeConfig
 {
     public WallLevelData[] levels;
@@ -15,7 +15,7 @@ public class WallUpgradeConfig : ConstructionUpgradeConfig
     public override ConstructionLevelData GetLevel(int index) => levels[index];
 }
 
-[CreateAssetMenu(menuName = "Game/Turret Upgrade Config")]
+[CreateAssetMenu(menuName = "Construction/Turret Upgrade Config")]
 public class TurretUpgradeConfig : ConstructionUpgradeConfig
 {
     public TurretLevelData[] levels;
