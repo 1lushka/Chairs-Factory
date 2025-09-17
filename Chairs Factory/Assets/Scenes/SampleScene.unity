@@ -640,6 +640,10 @@ PrefabInstance:
       propertyPath: m_Layer
       value: 3
       objectReference: {fileID: 0}
+    - target: {fileID: 4955759192321010413, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
+      propertyPath: maxHealth
+      value: 15
+      objectReference: {fileID: 0}
     - target: {fileID: 5744796169063964905, guid: d3413f4909bbb214799d13f7fb3627dc, type: 3}
       propertyPath: m_Layer
       value: 3
