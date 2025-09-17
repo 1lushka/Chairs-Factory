@@ -6,7 +6,9 @@ public class Turret : Construction
 {
     [SerializeField] float attackDamage;
     [SerializeField] float attackCooldown;
-
+    [SerializeField] GameObject bullet;
+    [SerializeField] float bulletSpeed;
+    [SerializeField] Transform shootPoint;
     IDamageable attackTarget;
     Coroutine attackCoroutine;
     bool isAttacking = false;
@@ -37,7 +39,10 @@ public class Turret : Construction
     {
         while (attackTarget != null && attackTarget.IsAlive && isAttacking)
         {
-            attackTarget.TakeDamage(attackDamage);
+            GameObject newBullet =  Instantiate(bullet, shootPoint.position, Quaternion.identity);
+            newBullet.transform.LookAt(attackTarget.Transform);
+            newBullet.GetComponent<Bullet>().SetSpeed(bulletSpeed);
+            //attackTarget.TakeDamage(attackDamage);
             yield return new WaitForSeconds(attackCooldown);
         }
         StopAttack();

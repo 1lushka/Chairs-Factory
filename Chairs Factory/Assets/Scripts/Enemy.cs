@@ -9,8 +9,6 @@ public class Enemy : Damageable
     [SerializeField] float attackDamage;
     [SerializeField] float attackCooldown;
     
-    
-
     NavMeshAgent agent;
     IDamageable attackTarget;
     IDamageable player;
