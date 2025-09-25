@@ -5,6 +5,7 @@ public class Bullet : MonoBehaviour
     private float damage;
     private float speed;
     private Rigidbody rb;
+    [SerializeField] private ParticleSystem hitParticle;
 
     private void Awake()
     {
@@ -14,9 +15,15 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter(Collider other)
     {
         IDamageable damageable = other.GetComponentInParent<Enemy>();
-        if(damageable != null)
+        if (damageable != null)
         {
             damageable.TakeDamage(damage);
+
+            if (hitParticle != null)
+            {
+                Instantiate(hitParticle, transform.position, Quaternion.identity);
+            }
+
             Destroy(gameObject);
         }
     }
@@ -31,7 +38,7 @@ public class Bullet : MonoBehaviour
         speed = newSpeed;
     }
 
-    public void SetDamage(float newDamage) 
+    public void SetDamage(float newDamage)
     {
         damage = newDamage;
     }

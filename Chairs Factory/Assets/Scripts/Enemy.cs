@@ -1,3 +1,4 @@
+﻿using System;
 using UnityEngine;
 using UnityEngine.AI;
 using System.Collections;
@@ -8,7 +9,13 @@ public class Enemy : Damageable
     [SerializeField] float attackRange;
     [SerializeField] float attackDamage;
     [SerializeField] float attackCooldown;
-    
+
+    [Header("Экономика")]
+    [SerializeField] int reward = 10;
+    public int Reward => reward;
+
+    public event Action<Enemy> OnDeath;
+
     NavMeshAgent agent;
     IDamageable attackTarget;
     IDamageable player;
@@ -18,7 +25,7 @@ public class Enemy : Damageable
     {
         base.Start();
         agent = GetComponent<NavMeshAgent>();
-        player  = FindFirstObjectByType<Player>();
+        player = FindFirstObjectByType<Player>();
     }
 
     void Update()
@@ -35,12 +42,7 @@ public class Enemy : Damageable
                 agent.isStopped = true;
                 if (attackCoroutine == null) attackCoroutine = StartCoroutine(AttackRoutine());
             }
-            else
-            {
-                //agent.isStopped = false;
-                //agent.SetDestination(attackTarget.Transform.position);
-                //StopAttackCoroutine();
-            }
+            
         }
         else
         {
@@ -91,6 +93,7 @@ public class Enemy : Damageable
     protected override void Die()
     {
         StopAttackCoroutine();
+        OnDeath?.Invoke(this);
         Destroy(gameObject);
     }
 

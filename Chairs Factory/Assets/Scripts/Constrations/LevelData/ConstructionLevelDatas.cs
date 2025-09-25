@@ -1,6 +1,9 @@
+using UnityEngine;
+
 [System.Serializable]
 public class ConstructionLevelData
 {
+    public int upgradePrice;
     public int maxHealth;
 }
 
