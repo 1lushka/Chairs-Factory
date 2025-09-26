@@ -37,18 +37,15 @@ public class GameManager : MonoBehaviour
     [Header("Экономика")]
     [SerializeField] private int startMoney = 100;
     [SerializeField] private TextMeshProUGUI moneyText;
+
+    [SerializeField] private GameObject[] startObjsActive;
+    [SerializeField] private GameObject[] startObjsNotActive;
     public int Money { get; private set; }
 
     private int currentWaveIndex = 0;
     private int enemiesAlive = 0;
     private Coroutine waveCoroutine;
 
-    void Start()
-    {
-        Money = startMoney;
-        UpdateMoneyUI();
-        SetState(GameState.Build);
-    }
 
     private void Update()
     {
@@ -56,6 +53,20 @@ public class GameManager : MonoBehaviour
         {
             StartWave();
         }
+    }
+    public void StartGame()
+    {
+        foreach (GameObject obj in startObjsActive)
+        {
+            obj.SetActive(true);
+        }
+        foreach (GameObject obj in startObjsNotActive)
+        {
+            obj.SetActive(false);
+        }
+        Money = startMoney;
+        UpdateMoneyUI();
+        SetState(GameState.Build);
     }
 
     public void StartWave()
