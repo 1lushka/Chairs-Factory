@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using DG.Tweening;
 
 [System.Serializable]
 public class EnemyGroup
@@ -46,7 +47,6 @@ public class GameManager : MonoBehaviour
     private int enemiesAlive = 0;
     private Coroutine waveCoroutine;
 
-
     private void Update()
     {
         if (Input.GetKeyUp(KeyCode.Escape))
@@ -54,6 +54,7 @@ public class GameManager : MonoBehaviour
             StartWave();
         }
     }
+
     public void StartGame()
     {
         foreach (GameObject obj in startObjsActive)
@@ -72,16 +73,13 @@ public class GameManager : MonoBehaviour
     public void StartWave()
     {
         if (currentState != GameState.Build || currentWaveIndex >= waves.Count) return;
-
         SetState(GameState.Wave);
-
         Wave wave = waves[currentWaveIndex];
         enemiesAlive = 0;
         foreach (var group in wave.enemyGroups)
         {
             enemiesAlive += group.count;
         }
-
         waveCoroutine = StartCoroutine(SpawnWave(wave));
     }
 
@@ -93,13 +91,14 @@ public class GameManager : MonoBehaviour
             {
                 Transform spawnPoint = wave.spawnPoints[UnityEngine.Random.Range(0, wave.spawnPoints.Count)];
                 GameObject enemyObj = Instantiate(group.prefab, spawnPoint.position, spawnPoint.rotation);
-
+                Vector3 originalScale = enemyObj.transform.localScale;
+                enemyObj.transform.localScale = Vector3.zero;
+                enemyObj.transform.DOScale(originalScale, 0.3f).SetEase(Ease.OutBack);
                 Enemy enemy = enemyObj.GetComponent<Enemy>();
                 if (enemy != null)
                 {
                     enemy.OnDeath += OnEnemyDeath;
                 }
-
                 yield return new WaitForSeconds(wave.spawnInterval);
             }
         }
@@ -109,9 +108,7 @@ public class GameManager : MonoBehaviour
     {
         enemiesAlive--;
         enemy.OnDeath -= OnEnemyDeath;
-
         AddMoney(enemy.Reward);
-
         if (enemiesAlive <= 0)
         {
             EndWave();
@@ -122,7 +119,6 @@ public class GameManager : MonoBehaviour
     {
         currentWaveIndex++;
         SetState(GameState.Build);
-
         if (waveCoroutine != null)
         {
             StopCoroutine(waveCoroutine);
@@ -133,10 +129,8 @@ public class GameManager : MonoBehaviour
     private void SetState(GameState newState)
     {
         currentState = newState;
-
         if (buildingManager != null)
             buildingManager.SetActive(currentState == GameState.Build);
-
         if (buildModeObjects != null)
         {
             foreach (var obj in buildModeObjects)

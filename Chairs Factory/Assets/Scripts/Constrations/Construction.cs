@@ -1,4 +1,5 @@
 using UnityEngine;
+using DG.Tweening;
 
 public abstract class Construction : Damageable
 {
@@ -8,17 +9,12 @@ public abstract class Construction : Damageable
 
     [SerializeField] protected ConstructionUpgradeConfig upgradeConfig;
     [SerializeField] protected int currentLevel = 0;
-    
 
-    //private void Awake()
-    //{
-    //    currentSize = upgradeConfig.GetLevel(currentLevel).gridSize;
-    //}
     public int GetUpgradePrice()
     {
         if (currentLevel + 1 < upgradeConfig.LevelCount)
         {
-            return upgradeConfig.GetLevel(currentLevel+1).upgradePrice;
+            return upgradeConfig.GetLevel(currentLevel + 1).upgradePrice;
         }
         return -1;
     }
@@ -29,6 +25,17 @@ public abstract class Construction : Damageable
         {
             currentLevel++;
             ApplyLevel(upgradeConfig.GetLevel(currentLevel));
+
+            Vector3 originalScale = transform.localScale;
+            Vector3 originalPos = transform.position;
+
+            Sequence seq = DOTween.Sequence();
+
+            seq.Append(transform.DOScale(originalScale * 1.15f, 0.25f).SetEase(Ease.OutBack));
+            seq.Join(transform.DOMoveY(originalPos.y + 0.5f, 0.25f).SetEase(Ease.OutQuad));
+
+            seq.Append(transform.DOScale(originalScale, 0.2f).SetEase(Ease.InOutSine));
+            seq.Join(transform.DOMoveY(originalPos.y, 0.2f).SetEase(Ease.InOutSine));
         }
     }
 
@@ -36,7 +43,6 @@ public abstract class Construction : Damageable
     {
         maxHealth = data.maxHealth;
         currentHealth = maxHealth;
-        //currentSize = data.gridSize;
     }
 
     protected override void Die()
@@ -44,7 +50,6 @@ public abstract class Construction : Damageable
         Destroy(gameObject);
     }
 
-    
     private void Start()
     {
         ApplyLevel(upgradeConfig.GetLevel(currentLevel));

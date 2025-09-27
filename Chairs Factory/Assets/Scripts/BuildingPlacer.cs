@@ -1,23 +1,20 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class BuildingPlacer : MonoBehaviour
 {
-    [Header("Сетка")]
     public float gridSize = 2f;
     public Color validColor = Color.green;
     public Color invalidColor = Color.red;
-
-    [Header("Сетка в игре")]
     public bool showRuntimeGrid = true;
     public RuntimeGridVisualizer runtimeGrid;
-
-    [Header("Ссылка на менеджер")]
     public BuildingManager buildingManager;
 
     private GameObject ghost;
     private HashSet<Vector2Int> occupied = new HashSet<Vector2Int>();
     private int rot;
+    private Vector3 ghostOriginalScale;
 
     void Start()
     {
@@ -58,7 +55,7 @@ public class BuildingPlacer : MonoBehaviour
         if (data == null || data.ghostPrefab == null) return;
 
         ghost = Instantiate(data.ghostPrefab);
-        ghost.name = "GhostBuilding";
+        ghost.name = "Ghost";
         ghost.transform.rotation = Quaternion.identity;
         rot = 0;
 
@@ -68,6 +65,12 @@ public class BuildingPlacer : MonoBehaviour
             renderer.material = new Material(renderer.sharedMaterial);
             renderer.material.color = validColor;
         }
+
+        ghostOriginalScale = ghost.transform.localScale;
+
+        ghost.transform.localScale = Vector3.zero;
+        ghost.transform.DOScale(ghostOriginalScale, 0.3f)
+            .SetEase(Ease.OutBack);
     }
 
     void UpdateGhostPosition()
@@ -100,7 +103,16 @@ public class BuildingPlacer : MonoBehaviour
     {
         rot = (rot + 1) % 4;
         if (ghost != null)
+        {
+            ghost.transform.DOKill();
+            ghost.transform.DOScale(ghostOriginalScale * 1.1f, 0.1f)
+                .SetEase(Ease.OutBack)
+                .OnComplete(() =>
+                {
+                    ghost.transform.DOScale(ghostOriginalScale, 0.1f).SetEase(Ease.InOutSine);
+                });
             ghost.transform.rotation = Quaternion.Euler(0f, 90f * rot, 0f);
+        }
     }
 
     void Place()
@@ -125,7 +137,21 @@ public class BuildingPlacer : MonoBehaviour
         Renderer ghostRend = ghost.GetComponent<Renderer>();
         float yOffset = ghostRend != null ? ghostRend.bounds.extents.y : 0f;
 
-        Instantiate(data.buildingPrefab, new Vector3(pos.x, yOffset, pos.z), ghost.transform.rotation);
+        GameObject newBuilding = Instantiate(
+            data.buildingPrefab,
+            new Vector3(pos.x, yOffset, pos.z),
+            ghost.transform.rotation
+        );
+
+        Vector3 originalScale = newBuilding.transform.localScale;
+        newBuilding.transform.localScale = originalScale * 0.8f;
+        newBuilding.transform.DOScale(originalScale * 1.1f, 0.2f)
+            .SetEase(Ease.OutBack)
+            .OnComplete(() =>
+            {
+                newBuilding.transform.DOScale(originalScale, 0.15f)
+                    .SetEase(Ease.InOutSine);
+            });
 
         foreach (var c in cells)
             occupied.Add(c);
@@ -188,12 +214,19 @@ public class BuildingPlacer : MonoBehaviour
     {
         if (ghost != null)
         {
-            if (Application.isPlaying)
-                Destroy(ghost);
-            else
-                DestroyImmediate(ghost);
-
-            ghost = null;
+            ghost.transform.DOScale(Vector3.zero, 0.2f)
+                .SetEase(Ease.InBack)
+                .OnComplete(() =>
+                {
+                    if (ghost != null)
+                    {
+                        if (Application.isPlaying)
+                            Destroy(ghost);
+                        else
+                            DestroyImmediate(ghost);
+                    }
+                    ghost = null;
+                });
         }
 
         if (runtimeGrid != null)
