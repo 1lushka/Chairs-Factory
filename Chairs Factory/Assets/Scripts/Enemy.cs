@@ -21,7 +21,7 @@ public class Enemy : Damageable
     IDamageable player;
     Coroutine attackCoroutine;
 
-    override protected void Start()
+    protected override void Start()
     {
         base.Start();
         agent = GetComponent<NavMeshAgent>();
@@ -40,9 +40,14 @@ public class Enemy : Damageable
             if (dist <= attackRange)
             {
                 agent.isStopped = true;
-                if (attackCoroutine == null) attackCoroutine = StartCoroutine(AttackRoutine());
+                if (attackCoroutine == null)
+                    attackCoroutine = StartCoroutine(AttackRoutine());
             }
-            
+            else
+            {
+                StopAttackCoroutine();
+                agent.isStopped = false;
+            }
         }
         else
         {
@@ -55,6 +60,15 @@ public class Enemy : Damageable
         }
     }
 
+    private void OnCollisionEnter(Collision collision)
+    {
+        if (collision == null) return;
+        Player player = collision.gameObject.GetComponent<Player>();
+        if (player != null) 
+        { 
+            
+        }
+    }
     void DetectAttackTarget()
     {
         Collider[] objs = Physics.OverlapSphere(transform.position, attackRange);
@@ -63,7 +77,7 @@ public class Enemy : Damageable
         foreach (var obj in objs)
         {
             IDamageable dmg = obj.GetComponentInParent<IDamageable>();
-            if (dmg != null && dmg.IsAlive && !(dmg is Enemy))
+            if (dmg != null && dmg.IsAlive && !(dmg is Enemy) && !(dmg is Player))
             {
                 attackTarget = dmg;
                 break;
@@ -73,12 +87,15 @@ public class Enemy : Damageable
 
     IEnumerator AttackRoutine()
     {
-        while (attackTarget != null && attackTarget.IsAlive && Vector3.Distance(transform.position, attackTarget.Transform.position) <= attackRange)
+        while (attackTarget != null && attackTarget.IsAlive &&
+               Vector3.Distance(transform.position, attackTarget.Transform.position) <= attackRange)
         {
             attackTarget.TakeDamage(attackDamage);
             yield return new WaitForSeconds(attackCooldown);
         }
+
         attackCoroutine = null;
+        agent.isStopped = false;
     }
 
     void StopAttackCoroutine()
