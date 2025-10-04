@@ -8,7 +8,13 @@ public abstract class Construction : Damageable
     [SerializeField] public int price;
 
     [SerializeField] protected ConstructionUpgradeConfig upgradeConfig;
-    [SerializeField] protected int currentLevel = 0;
+    [SerializeField] public int currentLevel = 0;
+
+
+    private void Start()
+    {
+        ApplyLevel(upgradeConfig.GetLevel(currentLevel));
+    }
 
     public int GetUpgradePrice()
     {
@@ -45,13 +51,21 @@ public abstract class Construction : Damageable
         currentHealth = maxHealth;
     }
 
+    public virtual void SetLevel(int level)
+    {
+        print(level);
+        currentLevel = level;
+        ApplyLevel(upgradeConfig.GetLevel(currentLevel));
+    }
+
+    public virtual void SetHealth(float health)
+    {
+        currentHealth = health;
+    }
     protected override void Die()
     {
         Destroy(gameObject);
     }
 
-    private void Start()
-    {
-        ApplyLevel(upgradeConfig.GetLevel(currentLevel));
-    }
+    
 }

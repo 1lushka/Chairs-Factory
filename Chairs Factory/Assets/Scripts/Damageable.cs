@@ -3,7 +3,7 @@ using UnityEngine;
 public abstract class Damageable : MonoBehaviour, IDamageable
 {
     [SerializeField] protected float maxHealth;
-    protected float currentHealth;
+    public float currentHealth;
 
     public bool IsAlive => currentHealth > 0;
     public Transform Transform => transform;

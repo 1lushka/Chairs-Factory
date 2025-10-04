@@ -63,10 +63,11 @@ public class Enemy : Damageable
     private void OnCollisionEnter(Collision collision)
     {
         if (collision == null) return;
-        Player player = collision.gameObject.GetComponent<Player>();
+        print("готрфшгигшни");
+        Player player = collision.gameObject.GetComponentInParent<Player>();
         if (player != null) 
-        { 
-            
+        {
+            player.TakeDamage(player.currentHealth);
         }
     }
     void DetectAttackTarget()

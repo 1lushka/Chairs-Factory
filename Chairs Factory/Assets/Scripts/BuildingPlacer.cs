@@ -1,13 +1,17 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using DG.Tweening;
 
 public class BuildingPlacer : MonoBehaviour
 {
+    [Header("Placement Settings")]
     public float gridSize = 2f;
     public Color validColor = Color.green;
     public Color invalidColor = Color.red;
     public bool showRuntimeGrid = true;
+
+    [Header("References")]
     public RuntimeGridVisualizer runtimeGrid;
     public BuildingManager buildingManager;
 
@@ -16,8 +20,12 @@ public class BuildingPlacer : MonoBehaviour
     private int rot;
     private Vector3 ghostOriginalScale;
 
+    private BuildingSaveManager saveSystem;
+
     void Start()
     {
+        saveSystem = FindAnyObjectByType<BuildingSaveManager>();
+        LoadBuildings();
         CreateGhost();
     }
 
@@ -35,6 +43,7 @@ public class BuildingPlacer : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.R)) RotateBuilding();
     }
 
+
     void HandleScroll()
     {
         float scroll = Input.mouseScrollDelta.y;
@@ -45,6 +54,7 @@ public class BuildingPlacer : MonoBehaviour
             CreateGhost();
         }
     }
+
 
     void CreateGhost()
     {
@@ -67,10 +77,8 @@ public class BuildingPlacer : MonoBehaviour
         }
 
         ghostOriginalScale = ghost.transform.localScale;
-
         ghost.transform.localScale = Vector3.zero;
-        ghost.transform.DOScale(ghostOriginalScale, 0.3f)
-            .SetEase(Ease.OutBack);
+        ghost.transform.DOScale(ghostOriginalScale, 0.3f).SetEase(Ease.OutBack);
     }
 
     void UpdateGhostPosition()
@@ -91,9 +99,7 @@ public class BuildingPlacer : MonoBehaviour
         ghost.transform.rotation = Quaternion.Euler(0f, 90f * rot, 0f);
 
         Vector2Int[] cells = GetCells(baseCell, size, rot);
-        bool canPlace = true;
-        foreach (var cell in cells)
-            if (occupied.Contains(cell)) canPlace = false;
+        bool canPlace = cells.All(c => !occupied.Contains(c));
 
         if (rend != null && rend.material != null)
             rend.material.color = canPlace ? validColor : invalidColor;
@@ -115,6 +121,7 @@ public class BuildingPlacer : MonoBehaviour
         }
     }
 
+
     void Place()
     {
         if (ghost == null || buildingManager == null) return;
@@ -127,8 +134,7 @@ public class BuildingPlacer : MonoBehaviour
         Vector2Int size = buildingManager.GetSize(data.buildingPrefab);
 
         Vector2Int[] cells = GetCells(baseCell, size, rot);
-        foreach (var c in cells)
-            if (occupied.Contains(c)) return;
+        if (cells.Any(c => occupied.Contains(c))) return;
 
         GameManager gameManager = FindAnyObjectByType<GameManager>();
         if (!gameManager.SpendMoney(buildingManager.GetPrice(data.buildingPrefab))) return;
@@ -149,13 +155,53 @@ public class BuildingPlacer : MonoBehaviour
             .SetEase(Ease.OutBack)
             .OnComplete(() =>
             {
-                newBuilding.transform.DOScale(originalScale, 0.15f)
-                    .SetEase(Ease.InOutSine);
+                newBuilding.transform.DOScale(originalScale, 0.15f).SetEase(Ease.InOutSine);
             });
 
         foreach (var c in cells)
             occupied.Add(c);
+
+        saveSystem.placedBuildings.Add(newBuilding);
+        saveSystem.SaveBuildings();
     }
+
+    void LoadBuildings()
+    {
+        var saved = saveSystem.LoadBuildings();
+        foreach (var data in saved)
+        {
+            var entry = buildingManager.buildings.Find(b => b.buildingPrefab.name == data.prefabName);
+            if (entry == null) continue;
+
+            GameObject prefab = entry.buildingPrefab;
+            GameObject b = Instantiate(
+                prefab,
+                new Vector3(data.posX, data.posY, data.posZ),
+                Quaternion.Euler(data.rotX, data.rotY, data.rotZ)
+            );
+
+            Construction c = b.GetComponent<Construction>();
+            if (c != null)
+            {
+                c.SetLevel(data.currentLevel);
+                c.SetHealth(data.currentHealth);
+            }
+
+            saveSystem.placedBuildings.Add(b);
+
+            Vector2Int baseCell = new Vector2Int(
+                Mathf.RoundToInt(data.posX / gridSize),
+                Mathf.RoundToInt(data.posZ / gridSize)
+            );
+
+            Vector2Int size = buildingManager.GetSize(prefab);
+            int rotationIndex = Mathf.RoundToInt(data.rotY / 90f) % 4;
+
+            foreach (var cell in GetCells(baseCell, size, rotationIndex))
+                occupied.Add(cell);
+        }
+    }
+
 
     Vector2Int? GetCell()
     {

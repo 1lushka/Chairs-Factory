@@ -20,19 +20,19 @@ public class BuildingManager : MonoBehaviour
     [Header("Постройки")]
     public List<BuildingData> buildings;
 
-    [Header("UI для построек")]
+    [Header("UI постройки")]
     public TextMeshProUGUI buildingNameText;
     public TextMeshProUGUI buildingPriceText;
 
-    [Header("UI для улучшений")]
+    [Header("UI  улучшения")]
     public TextMeshProUGUI upgradeNameText;
     public TextMeshProUGUI upgradePriceText;
+    public ToolMode currentMode = ToolMode.Build;
 
     private int selIdx;
     private Construction hoveredConstruction;
 
-    [Header("Текущий инструмент")]
-    public ToolMode currentMode = ToolMode.Build;
+    
 
     private BuildingPlacer buildingPlacer;
 
@@ -169,7 +169,7 @@ public class BuildingManager : MonoBehaviour
         if (hoveredConstruction == null) return;
 
         GameManager gameManager = FindAnyObjectByType<GameManager>();
-        if(hoveredConstruction.GetUpgradePrice() == -1) return;
+        if (hoveredConstruction.GetUpgradePrice() == -1) return;
         if (!gameManager.SpendMoney(hoveredConstruction.GetUpgradePrice())) return;
 
         hoveredConstruction.Upgrade();
