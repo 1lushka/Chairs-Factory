@@ -77,7 +77,6 @@ public class GameManager : MonoBehaviour
     {
         foreach (GameObject obj in startObjsActive) obj.SetActive(true);
         foreach (GameObject obj in startObjsNotActive) obj.SetActive(false);
-        if (Money <= 0) Money = startMoney;
         UpdateMoneyUI();
         SetState(GameState.Build);
     }
